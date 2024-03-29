@@ -2,7 +2,12 @@ package com.fureniku.roads.registrations;
 
 import com.fureniku.metropolis.RegistrationBase;
 import com.fureniku.metropolis.RegistrationGroup;
+import com.fureniku.metropolis.blocks.decorative.builders.MetroBlockDecorativeBuilder;
+import com.fureniku.metropolis.blocks.decorative.helpers.OffsetHelper;
+import com.fureniku.metropolis.enums.BlockOffsetDirection;
 import com.fureniku.metropolis.utils.CreativeTabSet;
+import com.fureniku.roads.data.PaintType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -48,14 +53,10 @@ public class RegistrationPaint extends RegistrationGroup {
         - Paint gun will now support all paint colours. Every colour can implement one specific dye colour, as well as an RGB value.
         - Paint gun tanks can hold more variants now. The UI buttons change to a dropdown, and you can select any dye that you have available
         - Every paint colour will have a cost associated for both options. For example, yellow might say 2mb of yellow dye, or 1mb each of green and blue.
-
-
-
-
-
      */
 
-    private final String PAINT_SINGLE_CENTER_LINE_CONNECTING = "_single_center_line_connecting";
+    private ArrayList<String> _paintLineNames = new ArrayList<>();
+    private CreativeTabSet _paintLineTab;
 
     private BlockBehaviour.Properties _props = BlockBehaviour.Properties.of().strength(1.0f).sound(SoundType.STONE);
 
@@ -63,18 +64,41 @@ public class RegistrationPaint extends RegistrationGroup {
         super(registrationBase);
     }
 
+    public MetroBlockDecorativeBuilder paintBlock(String modelName) {
+        return new MetroBlockDecorativeBuilder(_props)
+                .setModelDirectory("blocks/paint/")
+                .setModelName(modelName)
+                .setWidth(16)
+                .setHeight(0.5f)
+                .addHelper(new OffsetHelper(BlockOffsetDirection.DOWN));
+    }
+
     @Override
     public void init(IEventBus iEventBus) {
-
+        registerPaintSet(PaintType.WHITE_PAINT);
+        registerPaintSet(PaintType.YELLOW_PAINT);
+        registerPaintSet(PaintType.RED_PAINT);
     }
 
     @Override
     public void generateCreativeTabs() {
-
+        for (int i = 0; i < _paintLineNames.size(); i++) {
+            _paintLineTab.addItem(getItem(_paintLineNames.get(i)).get().getDefaultInstance());
+        }
     }
 
     @Override
     public ArrayList<CreativeTabSet> getCreativeTabs() {
-        return null;
+        ArrayList<CreativeTabSet> tabList = new ArrayList<>();
+        tabList.add(_paintLineTab);
+        return tabList;
+    }
+
+    private void registerPaintSet(PaintType paintType) {
+        registerLines(paintType.getUnlocalizedName(), paintType.getTexture());
+    }
+
+    private void registerLines(String paintName, ResourceLocation texture) {
+        _paintLineNames.add(registerBlockSet(paintName + PaintStrings.PAINT_LINE_SINGLE_CENTER, () -> paintBlock("bollard_concrete_pillar").setTextures(texture).build()));
     }
 }

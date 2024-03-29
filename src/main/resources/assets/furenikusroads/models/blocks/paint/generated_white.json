@@ -1,0 +1,9 @@
+{
+  "loader": "forge:obj",
+  "flip_v": true,
+  "model": "examplemod:models/block/model.obj",
+  "textures": {
+    "texture0": "minecraft:block/dirt",
+    "particle": "minecraft:block/dirt"
+  }
+}
